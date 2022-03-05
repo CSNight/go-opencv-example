@@ -1,0 +1,43 @@
+FROM debian
+ARG OPENCV_VERSION="4.5.4"
+ENV OPENCV_VERSION $OPENCV_VERSION
+WORKDIR /usr/local
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+            build-essential cmake pkg-config unzip libgtk2.0-dev \
+            curl ca-certificates libcurl4-openssl-dev libssl-dev \
+            libavcodec-dev libavformat-dev libswscale-dev libtbb2 libtbb-dev \
+            libjpeg-dev libpng-dev libtiff-dev libdc1394-22-dev && \
+	rm -rf /var/lib/apt/lists/* && \
+	apt-get clean && apt-get autoclean && \
+	curl -Lo opencv.zip https://www.raoyunsoft.com/opencv/opencv-${OPENCV_VERSION}/opencv-${OPENCV_VERSION}.zip && \
+    curl -Lo opencv_contrib.zip https://www.raoyunsoft.com/opencv/opencv_contrib/opencv_contrib-${OPENCV_VERSION}.zip && \
+	unzip -q opencv.zip && \
+    unzip -q opencv_contrib.zip && \
+    rm opencv.zip opencv_contrib.zip && \
+    cd opencv-${OPENCV_VERSION} && \
+    mkdir build && cd build && \
+    cmake -D CMAKE_BUILD_TYPE=RELEASE \
+                  -D WITH_IPP=ON \
+                  -D WITH_OPENGL=OFF \
+                  -D WITH_QT=OFF \
+                  -D CMAKE_INSTALL_PREFIX=/usr/local \
+                  -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib-${OPENCV_VERSION}/modules \
+                  -D OPENCV_ENABLE_NONFREE=ON \
+                  -D WITH_JASPER=ON \
+                  -D WITH_TBB=ON \
+                  -D BUILD_DOCS=OFF \
+                  -D BUILD_JPEG=ON \
+                  -D BUILD_PNG=ON \
+                  -D BUILD_TIFF=ON \
+                  -D BUILD_EXAMPLES=OFF \
+                  -D BUILD_TESTS=OFF \
+                  -D BUILD_PERF_TESTS=OFF \
+                  -D BUILD_opencv_java=NO \
+                  -D BUILD_opencv_python=NO \
+                  -D BUILD_opencv_python2=NO \
+                  -D BUILD_opencv_python3=NO \
+                  -D OPENCV_GENERATE_PKGCONFIG=ON .. && \
+	make -j $(nproc --all) && make preinstall && make install && ldconfig && \
+	cd /usr/local/ && rm -rf opencv* && \
+	apt-get --purge remove -y curl cmake unzip
