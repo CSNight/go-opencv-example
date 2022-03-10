@@ -3,8 +3,9 @@ package main
 import (
 	"gocv.io/x/gocv"
 	"image"
+	"image/png"
 	"math"
-	"sync"
+	"os"
 )
 
 func main() {
@@ -12,13 +13,30 @@ func main() {
 		X: 195, Y: 122,
 	}
 	angle := -24.5771
-	src := gocv.IMRead("a.png", gocv.IMReadColor)
+	sf, err := os.Open("a.png")
+	defer sf.Close()
+	img, err := png.Decode(sf)
+	if err != nil {
+		return
+	}
+	src, err := gocv.ImageToMatRGB(img)
+	if err != nil {
+		return
+	}
 	var dest gocv.Mat = gocv.NewMat()
 	rotateImage(src, &dest, -angle, center)
-	gocv.IMWrite("b.png", dest)
-	var wg sync.WaitGroup
-	wg.Add(1)
-	wg.Wait()
+	bytes, err := gocv.IMEncode(".png", dest)
+	if err != nil {
+		return
+	}
+	defer bytes.Close()
+	f, err := os.Create("b.png")
+	defer f.Close()
+	_, err = f.Write(bytes.GetBytes())
+	if err != nil {
+		return
+	}
+
 }
 
 func rotateImage(src gocv.Mat, dst *gocv.Mat, angle float64, center gocv.Point2f) {

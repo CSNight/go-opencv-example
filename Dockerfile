@@ -1,7 +1,7 @@
 FROM csnight/opencv:4.5.4
 
 ENV GO111MODULE=on
-ENV GOPROXY=https://goproxy.cn,direct
+ENV GOPROXY=https://goproxy.cn
 ENV PATH=/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 WORKDIR /usr/local
 ADD . .

@@ -1,4 +1,4 @@
-FROM debian
+FROM registry.sensetime.com/gateway/golang:1.12.7
 ARG OPENCV_VERSION="4.5.4"
 ENV OPENCV_VERSION $OPENCV_VERSION
 WORKDIR /usr/local
