@@ -6,6 +6,7 @@ import (
 	"image/png"
 	"math"
 	"os"
+	"sync"
 )
 
 func main() {
@@ -36,7 +37,9 @@ func main() {
 	if err != nil {
 		return
 	}
-
+	var wg sync.WaitGroup
+	wg.Add(1)
+	wg.Wait()
 }
 
 func rotateImage(src gocv.Mat, dst *gocv.Mat, angle float64, center gocv.Point2f) {
